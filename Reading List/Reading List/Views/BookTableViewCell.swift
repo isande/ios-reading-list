@@ -11,8 +11,15 @@ import UIKit
 class BookTableViewCell: UITableViewCell {
 
     @IBOutlet weak var titleLabel: UILabel!
-    
     @IBOutlet weak var readButton: UIButton!
+    
+    var book: Book? {
+        didSet {
+            updateViews()
+        }
+    }
+    
+    weak var delegate: BookTableViewCellDelegate?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -20,7 +27,25 @@ class BookTableViewCell: UITableViewCell {
     }
 
     @IBAction func readButtonTapped(_ sender: UIButton) {
+        
+        delegate?.toggleHasBeenRead(for: self)
+        updateViews()
+        
     }
+    
+    func updateViews() {
+        if let book = book {
+            titleLabel.text = book.title
+        }
+        
+        if book?.hasBeenRead == true  {
+            readButton.setImage(#imageLiteral(resourceName: "checked"), for: .normal)
+        } else {
+            readButton.setImage(#imageLiteral(resourceName: "unchecked"), for: .normal)
+        }
+        
+    }
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 

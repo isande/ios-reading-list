@@ -12,13 +12,26 @@ class BookController {
 
     var books: [Book] = []
     
-    func createBook(with title: String, reasonToRead: String) -> Book {
+    var readingListURL: URL? {
+        
+        let fm = FileManager.default
+        
+        guard let dir = fm.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        
+        return dir.appendingPathComponent("ReadingList.plist")
+        
+    }
+    
+    init() {
+        loadFromPersistentStore()
+    }
+    
+    func createBook(with title: String, reasonToRead: String) {
         
         let book = Book(title: title, reasonToRead: reasonToRead)
         
         books.append(book)
         saveToPersistentStore()
-        return book
         
     }
     
@@ -39,34 +52,26 @@ class BookController {
         
     }
     
-    func editBook(for book: Book) {
-        guard let edited = books.firstIndex(of: book) else { return }
+    func editBook(for book: Book, newTitle: String, newReason: String) {
+        guard let edited = books.index(of: book) else { return }
         
-        books[edited].title = book.title
-        books[edited].reasonToRead = book.reasonToRead
+        books[edited].title = newTitle
+        books[edited].reasonToRead = newReason
         saveToPersistentStore()
         
     }
     
     var readBooks: [Book] {
-        return books.filter {$0.hasBeenRead == true}
+        return books.filter { $0.hasBeenRead }
     }
     
     var unreadBooks: [Book] {
-        return books.filter {$0.hasBeenRead == false}
+        return books.filter { !$0.hasBeenRead }
     }
     
-    private var readingListURL: URL? {
-        
-        let fm = FileManager.default
-        
-        guard let dir = fm.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
-        
-        return dir.appendingPathComponent("ReadingList.plist")
-        
-    }
+
     
-    private func saveToPersistentStore() {
+    func saveToPersistentStore() {
         guard let url = readingListURL else { return }
         
         do {
@@ -82,7 +87,7 @@ class BookController {
         }
     }
     
-    private func loadFromPersistentStore() {
+    func loadFromPersistentStore() {
         
         let fm = FileManager.default
         
