@@ -48,6 +48,13 @@ class BookController {
         
     }
     
+    var readBooks: [Book] {
+        return books.filter {$0.hasBeenRead == true}
+    }
+    
+    var unreadBooks: [Book] {
+        return books.filter {$0.hasBeenRead == false}
+    }
     
     private var readingListURL: URL? {
         
